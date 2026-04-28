@@ -1,0 +1,71 @@
+name: Render Video
+
+on:
+  workflow_dispatch:
+    inputs:
+      composition:
+        description: 'Composition to render (e.g., AIDevFlow)'
+        required: true
+        default: 'AIDevFlow'
+        type: string
+  push:
+    branches: [main]
+    paths:
+      - 'src/compositions/**'
+      - 'src/components/**'
+      - 'src/hooks/**'
+      - 'src/utils/**'
+      - 'src/Root.tsx'
+      - 'remotion.config.ts'
+
+jobs:
+  render:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y xvfb libegl1-mesa libgl1-mesa-dri libgbm1
+
+      - run: npm ci
+
+      - name: Determine composition
+        id: comp
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "id=${{ inputs.composition }}" >> $GITHUB_OUTPUT
+          else
+            echo "id=AIDevFlow" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Render composition
+        run: |
+          mkdir -p out
+          xvfb-run --auto-servernum npx remotion render src/index.ts ${{ steps.comp.outputs.id }} out/${{ steps.comp.outputs.id }}.mp4 --codec h264 --gl=swangle
+
+      - name: Upload video artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: video-${{ steps.comp.outputs.id }}-${{ github.sha }}
+          path: out/*.mp4
+          retention-days: 30
+
+      - name: Upload to S3
+        if: env.AWS_ACCESS_KEY_ID != ''
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: us-east-1
+        run: |
+          BUCKET="${{ secrets.S3_BUCKET || 'htekdev-renders' }}"
+          DATE=$(date +%Y-%m-%d)
+          aws s3 cp out/${{ steps.comp.outputs.id }}.mp4 s3://${BUCKET}/explainer-3d/${{ steps.comp.outputs.id }}-${DATE}.mp4
