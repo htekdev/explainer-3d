@@ -133,13 +133,51 @@ npm run render:all
 npx remotion render src/index.ts AIDevFlow out/video.mp4 --codec h264 --gl=swangle
 ```
 
+### Lambda (AWS)
+
+Render on AWS Lambda for faster, parallelized rendering without local GPU dependencies.
+
+#### Setup
+
+1. **Deploy the Remotion Lambda function** (one-time):
+   ```bash
+   npx remotion lambda functions deploy --memory 2048 --disk 2048 --timeout 240
+   ```
+
+2. **Set environment variables**:
+   ```bash
+   export AWS_ACCESS_KEY_ID=your-key
+   export AWS_SECRET_ACCESS_KEY=your-secret
+   export REMOTION_LAMBDA_FUNCTION_NAME=remotion-render-4-0-429-mem2048mb-disk2048mb-240sec
+   export REMOTION_LAMBDA_REGION=us-east-1          # optional, defaults to us-east-1
+   export REMOTION_LAMBDA_SITE_NAME=explainer-3d    # optional, defaults to explainer-3d
+   ```
+
+3. **Render**:
+   ```bash
+   npm run render:lambda                                          # All compositions
+   npm run render:lambda -- --composition AIDevFlow               # Single composition
+   npx tsx src/renderer/render-all.ts --lambda --composition AIDevFlow  # Direct
+   ```
+
+#### IAM Policies
+
+See the `aws/` directory for required IAM policies:
+- `remotion-lambda-role-policy.json` — Attach to the Lambda execution role (S3, CloudWatch)
+- `remotion-lambda-user-policy.json` — Attach to the IAM user deploying/invoking Lambda
+
 ### CI/CD (GitHub Actions)
 
 The `render.yml` workflow:
 - Triggers on push to `main` (when source files change) or manual dispatch
-- Renders the composition in a headless environment
+- Supports **local** and **lambda** render modes (select via workflow_dispatch)
+- Local mode: renders in a headless environment with xvfb + Mesa
+- Lambda mode: bundles, deploys to S3, renders on AWS Lambda (no GPU needed)
 - Uploads the video as a GitHub Actions artifact (30-day retention)
 - Optionally uploads to S3 (configure `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `S3_BUCKET` secrets)
+
+**Required secrets for Lambda mode**: `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `REMOTION_LAMBDA_FUNCTION_NAME`
+**Optional vars**: `REMOTION_LAMBDA_REGION` (default: `us-east-1`)
 
 ---
 
@@ -147,6 +185,9 @@ The `render.yml` workflow:
 
 ```
 explainer-3d/
+├── aws/                      # IAM policies for Lambda rendering
+│   ├── remotion-lambda-role-policy.json
+│   └── remotion-lambda-user-policy.json
 ├── src/
 │   ├── components/          # Reusable 3D components
 │   │   ├── Scene3D.tsx      # ThreeCanvas wrapper + lighting + bloom
@@ -181,6 +222,7 @@ explainer-3d/
 │   │   └── types.ts         # Shared types
 │   ├── renderer/            # Batch rendering
 │   │   ├── compositions.ts
+│   │   ├── lambda.ts        # AWS Lambda rendering
 │   │   └── render-all.ts
 │   ├── Root.tsx              # Remotion root
 │   └── index.ts              # Entry point

@@ -8,6 +8,14 @@ on:
         required: true
         default: 'AIDevFlow'
         type: string
+      render_mode:
+        description: 'Rendering mode'
+        required: true
+        default: 'local'
+        type: choice
+        options:
+          - local
+          - lambda
   push:
     branches: [main]
     paths:
@@ -32,6 +40,7 @@ jobs:
           cache: 'npm'
 
       - name: Install system dependencies
+        if: inputs.render_mode != 'lambda'
         run: |
           sudo apt-get update
           sudo apt-get install -y xvfb libegl1 libgl1-mesa-dri libgbm1
@@ -47,10 +56,22 @@ jobs:
             echo "id=AIDevFlow" >> $GITHUB_OUTPUT
           fi
 
-      - name: Render composition
+      - name: Render (local)
+        if: inputs.render_mode != 'lambda'
         run: |
           mkdir -p out
           xvfb-run --auto-servernum npx remotion render src/index.ts ${{ steps.comp.outputs.id }} out/${{ steps.comp.outputs.id }}.mp4 --codec h264 --gl=swangle
+
+      - name: Render (Lambda)
+        if: inputs.render_mode == 'lambda'
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          REMOTION_LAMBDA_FUNCTION_NAME: ${{ secrets.REMOTION_LAMBDA_FUNCTION_NAME }}
+          REMOTION_LAMBDA_REGION: us-east-1
+          REMOTION_LAMBDA_SITE_NAME: explainer-3d
+        run: |
+          npx tsx src/renderer/render-all.ts --lambda --composition ${{ steps.comp.outputs.id }}
 
       - name: Upload video artifact
         uses: actions/upload-artifact@v4

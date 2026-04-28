@@ -13,6 +13,7 @@
     "lint": "eslint src/ tests/",
     "render": "remotion render src/index.ts",
     "render:all": "tsx src/renderer/render-all.ts",
+    "render:lambda": "tsx src/renderer/render-all.ts --lambda",
     "render:ai-dev-flow": "remotion render src/index.ts AIDevFlow out/ai-dev-flow.mp4 --gl=swangle"
   },
   "dependencies": {
@@ -21,6 +22,7 @@
     "@react-three/postprocessing": "3.0.4",
     "@remotion/bundler": "4.0.429",
     "@remotion/cli": "4.0.429",
+    "@remotion/lambda": "4.0.429",
     "@remotion/renderer": "4.0.429",
     "@remotion/three": "4.0.429",
     "postprocessing": "6.36.7",
