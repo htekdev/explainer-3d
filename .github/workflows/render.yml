@@ -60,12 +60,13 @@ jobs:
           retention-days: 30
 
       - name: Upload to S3
-        if: ${{ secrets.AWS_ACCESS_KEY_ID != '' }}
+        if: vars.ENABLE_S3_UPLOAD == 'true'
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_DEFAULT_REGION: us-east-1
+          S3_BUCKET: ${{ vars.S3_BUCKET }}
         run: |
-          BUCKET="${{ secrets.S3_BUCKET || 'htekdev-renders' }}"
+          BUCKET="${S3_BUCKET:-htekdev-renders}"
           DATE=$(date +%Y-%m-%d)
-          aws s3 cp out/${{ steps.comp.outputs.id }}.mp4 s3://${BUCKET}/explainer-3d/${{ steps.comp.outputs.id }}-${DATE}.mp4
+          aws s3 cp out/${{ steps.comp.outputs.id }}.mp4 "s3://${BUCKET}/explainer-3d/${{ steps.comp.outputs.id }}-${DATE}.mp4"
