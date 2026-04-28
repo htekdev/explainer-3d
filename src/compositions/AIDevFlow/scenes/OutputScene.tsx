@@ -1,58 +1,221 @@
 import React from 'react';
-import { AbsoluteFill } from 'remotion';
+import { useCurrentFrame } from 'remotion';
 import {
-  Scene3D, SystemBox, TokenStream, Arrow3D, DataFlow,
-  GlowOrb, GridFloor, ParticleField, FloatingLabel, AnimatedCamera,
+  SystemBox, TokenStream, Arrow3D, DataFlow,
+  GlowOrb, FloatingLabel, ConnectionBeam,
 } from '../../../components';
 
 const OUTPUT_TOKENS = [
-  'const', 'result', '=', 'await', 'fetchData();',
-  'return', 'format(result);',
+  'Creating', 'Express', 'server...', 'Adding', 'JWT', 'auth...',
+  'Configuring', 'rate', 'limiter...',
+];
+const TOOL_CALL_TOKENS = ['edit:', 'src/index.ts', 'run:', 'npm', 'install'];
+const RESPONSE_TOKENS = [
+  '✓', 'Server', 'created', '✓', 'Auth', 'added',
+  '✓', 'Rate', 'limiting', 'configured',
 ];
 
-export const OutputScene: React.FC = () => {
+interface OutputLoopPhaseProps {
+  readonly startFrame: number;
+}
+
+export const OutputLoopPhase: React.FC<OutputLoopPhaseProps> = ({ startFrame }) => {
+  const frame = useCurrentFrame();
+  const elapsed = frame - startFrame;
+
+  if (elapsed < 0) return null;
+
   return (
-    <AbsoluteFill>
-      <Scene3D camera={{ position: [0, 3, 10], fov: 50 }}>
-        <AnimatedCamera
-          keyframes={[
-            { frame: 0, position: [0, 2, 8], lookAt: [0, 0.5, 0] },
-            { frame: 120, position: [3, 2, 7], lookAt: [1, 0.5, 0] },
-          ]}
-        />
-        <GridFloor />
-        <ParticleField count={100} spread={8} opacity={0.15} seed={400} />
+    <group>
+      {/* Output tokens flowing right from model */}
+      <TokenStream
+        color="#00D4AA"
+        direction="right"
+        fontSize={0.14}
+        position={[3.8, 0.5, 0.3]}
+        seed={401}
+        speed={3}
+        startFrame={startFrame}
+        tokens={OUTPUT_TOKENS}
+      />
 
-        <GlowOrb position={[-3, 0.5, 0]} radius={0.6} color="#7B61FF"
-          intensity={1.5} pulseSpeed={1} startFrame={0} />
-        <FloatingLabel text="Model" position={[-3, 2, 0]}
-          fontSize={0.25} animateIn={{ startFrame: 0, durationFrames: 15 }} />
+      {/* Output stream label */}
+      <FloatingLabel
+        animateIn={{ startFrame, durationFrames: 20 }}
+        color="#00D4AA"
+        fontSize={0.2}
+        position={[5, 1.5, 0]}
+        text="Output Tokens"
+      />
 
-        <TokenStream
-          tokens={OUTPUT_TOKENS}
-          position={[-1.5, 0.5, 0]}
-          direction="right"
-          speed={3}
-          color="#00D4AA"
-          fontSize={0.18}
-          startFrame={20}
-          seed={401}
-        />
+      {/* Split point */}
+      <GlowOrb
+        color="#00D4AA"
+        intensity={1.5}
+        position={[7, 0.5, 0]}
+        pulseSpeed={1}
+        radius={0.3}
+        startFrame={startFrame + 60}
+      />
 
-        <Arrow3D from={[-2, 0.5, 0]} to={[2, 0.5, 0]} color="#FFB800"
-          startFrame={30} durationFrames={40} />
+      {/* Arrow to split */}
+      <Arrow3D
+        color="#00D4AA"
+        durationFrames={40}
+        from={[5.5, 0.5, 0]}
+        startFrame={startFrame + 40}
+        to={[7, 0.5, 0]}
+      />
 
-        <SystemBox position={[4, 0.5, 0]} label="Tool Calls"
-          color="#FF6B9D" size={[2, 1.5, 0.3]}
-          animateIn={{ startFrame: 60, durationFrames: 30 }} />
+      {/* === Upper path: Response Text === */}
+      <Arrow3D
+        color="#00FF88"
+        durationFrames={30}
+        from={[7, 0.5, 0]}
+        startFrame={startFrame + 80}
+        to={[8, 2.5, 0]}
+      />
 
-        <DataFlow from={[2, 0.5, 0]} to={[4, 0.5, 0]} color="#FF6B9D"
-          particleCount={20} startFrame={70} seed={402} />
+      <SystemBox
+        animateIn={{ startFrame: startFrame + 100, durationFrames: 30 }}
+        color="#00FF88"
+        glowIntensity={0.3}
+        label="Response"
+        position={[9.5, 2.5, 0]}
+        size={[2.5, 1.2, 0.3]}
+      />
 
-        <FloatingLabel text="Output Tokens" position={[0, 2, 0]}
-          fontSize={0.3} color="#00D4AA"
-          animateIn={{ startFrame: 10, durationFrames: 20 }} />
-      </Scene3D>
-    </AbsoluteFill>
+      <TokenStream
+        color="#00FF88"
+        direction="right"
+        fontSize={0.12}
+        position={[8.5, 2.5, 0.3]}
+        seed={403}
+        speed={2.5}
+        startFrame={startFrame + 120}
+        tokens={RESPONSE_TOKENS}
+      />
+
+      <FloatingLabel
+        animateIn={{ startFrame: startFrame + 110, durationFrames: 20 }}
+        color="#00FF88"
+        fontSize={0.2}
+        position={[9.5, 3.5, 0]}
+        text="Response Text"
+      />
+
+      {/* === Lower path: Tool Calls === */}
+      <Arrow3D
+        color="#FF6B9D"
+        durationFrames={30}
+        from={[7, 0.5, 0]}
+        startFrame={startFrame + 80}
+        to={[8, -1, 0]}
+      />
+
+      <SystemBox
+        animateIn={{ startFrame: startFrame + 100, durationFrames: 30 }}
+        color="#FFB800"
+        label="Tool Calls"
+        position={[9, -1, 0]}
+        size={[2, 1, 0.3]}
+      />
+
+      <TokenStream
+        color="#FF6B9D"
+        direction="right"
+        fontSize={0.12}
+        position={[8.2, -1, 0.3]}
+        seed={402}
+        speed={2}
+        startFrame={startFrame + 120}
+        tokens={TOOL_CALL_TOKENS}
+      />
+
+      <FloatingLabel
+        animateIn={{ startFrame: startFrame + 110, durationFrames: 20 }}
+        color="#FFB800"
+        fontSize={0.2}
+        position={[9, -0.2, 0]}
+        text="Tool Calls"
+      />
+
+      {/* === Feedback Loop: Tool Calls back to Tools box === */}
+      {/* Curved path via intermediate points */}
+      <DataFlow
+        color="#FFB800"
+        durationFrames={600}
+        from={[9, -1, 0]}
+        particleCount={40}
+        seed={410}
+        speed={0.8}
+        startFrame={startFrame + 150}
+        to={[2, -2.5, 0]}
+      />
+      <DataFlow
+        color="#FFB800"
+        durationFrames={600}
+        from={[2, -2.5, 0]}
+        particleCount={40}
+        seed={411}
+        speed={0.8}
+        startFrame={startFrame + 170}
+        to={[-4, -1, 0]}
+      />
+      <DataFlow
+        color="#FFB800"
+        durationFrames={600}
+        from={[-4, -1, 0]}
+        particleCount={30}
+        seed={412}
+        speed={0.8}
+        startFrame={startFrame + 190}
+        to={[-4, 0.5, 0]}
+      />
+
+      {/* Feedback loop connection beams */}
+      <ConnectionBeam
+        color="#FFB800"
+        from={[9, -1, 0]}
+        startFrame={startFrame + 150}
+        to={[2, -2.5, 0]}
+        width={0.015}
+      />
+      <ConnectionBeam
+        color="#FFB800"
+        from={[2, -2.5, 0]}
+        startFrame={startFrame + 170}
+        to={[-4, -1, 0]}
+        width={0.015}
+      />
+      <ConnectionBeam
+        color="#FFB800"
+        from={[-4, -1, 0]}
+        startFrame={startFrame + 190}
+        to={[-4, 0.5, 0]}
+        width={0.015}
+      />
+
+      {/* Agentic Loop label */}
+      <FloatingLabel
+        animateIn={{ startFrame: startFrame + 200, durationFrames: 30 }}
+        color="#FFB800"
+        fontSize={0.25}
+        position={[2, -3.2, 0]}
+        text="Agentic Loop"
+      />
+
+      {/* Final wide-shot title */}
+      <FloatingLabel
+        animateIn={{ startFrame: startFrame + 300, durationFrames: 40 }}
+        color="#FFFFFF"
+        fontSize={0.5}
+        position={[1, 4.5, 0]}
+        text="How AI Agent Development Works"
+      />
+    </group>
   );
 };
+
+// Keep legacy export
+export const OutputScene = OutputLoopPhase;

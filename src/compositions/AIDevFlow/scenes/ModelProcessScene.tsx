@@ -1,34 +1,83 @@
 import React from 'react';
-import { AbsoluteFill } from 'remotion';
-import { Scene3D, GlowOrb, ParticleField, FloatingLabel, GridFloor, AnimatedCamera } from '../../../components';
+import { useCurrentFrame } from 'remotion';
+import { SystemBox, GlowOrb, FloatingLabel, ParticleField } from '../../../components';
 
-export const ModelProcessScene: React.FC = () => {
+interface AgentProcessPhaseProps {
+  readonly startFrame: number;
+}
+
+export const AgentProcessPhase: React.FC<AgentProcessPhaseProps> = ({ startFrame }) => {
+  const frame = useCurrentFrame();
+  const elapsed = frame - startFrame;
+
+  if (elapsed < 0) return null;
+
+  const processingPulse = 1 + Math.sin(elapsed * 0.08) * 0.3;
+
   return (
-    <AbsoluteFill>
-      <Scene3D camera={{ position: [0, 2, 6], fov: 50 }}
-        bloom={{ intensity: 2, luminanceThreshold: 0.15, luminanceSmoothing: 0.8 }}>
-        <AnimatedCamera
-          keyframes={[
-            { frame: 0, position: [0, 2, 8], lookAt: [0, 0.5, 0] },
-            { frame: 60, position: [2, 1.5, 6], lookAt: [0, 0.5, 0] },
-            { frame: 180, position: [-1, 2.5, 5], lookAt: [0, 0.5, 0] },
-          ]}
+    <group>
+      {/* Agent Model — large glowing box */}
+      <SystemBox
+        animateIn={{ startFrame, durationFrames: 40 }}
+        color="#FF6B9D"
+        glowIntensity={0.8 * processingPulse}
+        label="AI Agent"
+        position={[2, 0.5, 0]}
+        size={[3, 2, 0.5]}
+      />
+
+      {/* Label above */}
+      <FloatingLabel
+        animateIn={{ startFrame: startFrame + 20, durationFrames: 30 }}
+        color="#FFFFFF"
+        fontSize={0.35}
+        position={[2, 2.2, 0]}
+        text="AI Agent"
+      />
+
+      {/* Inner processing orb */}
+      <GlowOrb
+        color="#FF6B9D"
+        intensity={3 * processingPulse}
+        position={[2, 0.5, 0.3]}
+        pulseSpeed={3}
+        radius={0.5}
+        startFrame={startFrame + 10}
+      />
+
+      {/* Secondary processing orb */}
+      <GlowOrb
+        color="#4A90D9"
+        intensity={1.5}
+        position={[2, 0.5, 0.3]}
+        pulseSpeed={2}
+        radius={0.8}
+        startFrame={startFrame + 20}
+      />
+
+      {/* Internal swirling particles */}
+      <group position={[2, 0.5, 0]}>
+        <ParticleField
+          color="#FF6B9D"
+          count={200}
+          opacity={0.3}
+          seed={300}
+          speed={1.2}
+          spread={1.2}
         />
-        <GridFloor />
-        <ParticleField count={300} spread={6} speed={0.8} opacity={0.25} color="#7B61FF" seed={300} />
+      </group>
 
-        <GlowOrb position={[0, 0.5, 0]} radius={1} color="#7B61FF"
-          intensity={3} pulseSpeed={3} startFrame={0} />
-        <GlowOrb position={[0, 0.5, 0]} radius={1.5} color="#4A90D9"
-          intensity={1} pulseSpeed={2} startFrame={10} />
-
-        <FloatingLabel text="AI Model" position={[0, 2.8, 0]}
-          fontSize={0.45} color="#FFFFFF"
-          animateIn={{ startFrame: 20, durationFrames: 30 }} />
-        <FloatingLabel text="Processing..." position={[0, -1, 0]}
-          fontSize={0.2} color="#8888AA"
-          animateIn={{ startFrame: 60, durationFrames: 20 }} />
-      </Scene3D>
-    </AbsoluteFill>
+      {/* Processing sublabel */}
+      <FloatingLabel
+        animateIn={{ startFrame: startFrame + 60, durationFrames: 20 }}
+        color="#8888AA"
+        fontSize={0.15}
+        position={[2, -0.8, 0]}
+        text="Processing tokens..."
+      />
+    </group>
   );
 };
+
+// Keep legacy export
+export const ModelProcessScene = AgentProcessPhase;
