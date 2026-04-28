@@ -103,7 +103,7 @@ Add to `src/Root.tsx`:
 
 ```bash
 npm start                    # Preview in Remotion Studio
-npm run render -- MyVideo    # Render to MP4
+npm run render -- MyVideo out/MyVideo.mp4    # Render to MP4
 ```
 
 ---

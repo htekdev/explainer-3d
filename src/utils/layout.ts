@@ -10,13 +10,14 @@ export function circularPosition(
 
 export function gridPosition(
   index: number,
-  columns: number,
+  total: number,
+  columns: number = 3,
   spacing: number = 2,
   center: boolean = true,
 ): [number, number, number] {
   const row = Math.floor(index / columns);
   const col = index % columns;
-  const totalRows = Math.ceil(index / columns) + 1;
+  const totalRows = Math.ceil(total / columns);
   const offsetX = center ? ((columns - 1) * spacing) / 2 : 0;
   const offsetZ = center ? ((totalRows - 1) * spacing) / 2 : 0;
   return [col * spacing - offsetX, 0, row * spacing - offsetZ];

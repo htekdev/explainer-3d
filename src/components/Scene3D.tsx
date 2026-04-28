@@ -1,7 +1,9 @@
 import React from 'react';
 import { ThreeCanvas } from '@remotion/three';
 import { useVideoConfig } from 'remotion';
+import { useThree, useFrame } from '@react-three/fiber';
 import { EffectComposer, Bloom } from '@react-three/postprocessing';
+import * as THREE from 'three';
 
 interface Scene3DProps {
   children: React.ReactNode;
@@ -28,6 +30,14 @@ function Lights() {
   );
 }
 
+function CameraLookAt({ target }: { target: [number, number, number] }) {
+  const { camera } = useThree();
+  useFrame(() => {
+    camera.lookAt(new THREE.Vector3(...target));
+  });
+  return null;
+}
+
 export const Scene3D: React.FC<Scene3DProps> = ({
   children,
   camera = { position: [0, 3, 10], fov: 50 },
@@ -47,6 +57,7 @@ export const Scene3D: React.FC<Scene3DProps> = ({
       style={{ backgroundColor }}
       gl={{ antialias: true }}
     >
+      {camera.lookAt && <CameraLookAt target={camera.lookAt} />}
       <Lights />
       {children}
       <EffectComposer>

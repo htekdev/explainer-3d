@@ -22,10 +22,33 @@ describe('circularPosition', () => {
 
 describe('gridPosition', () => {
   it('first item at centered origin', () => {
-    const [x, y, z] = gridPosition(0, 3, 2, true);
+    const [x, y, z] = gridPosition(0, 6, 3, 2, true);
     expect(y).toBe(0);
     expect(typeof x).toBe('number');
     expect(typeof z).toBe('number');
+  });
+
+  it('items in same row get same Z offset', () => {
+    const total = 6;
+    const columns = 3;
+    const [, , z0] = gridPosition(0, total, columns);
+    const [, , z1] = gridPosition(1, total, columns);
+    const [, , z2] = gridPosition(2, total, columns);
+    expect(z0).toBe(z1);
+    expect(z1).toBe(z2);
+  });
+
+  it('uses total not index for totalRows calculation', () => {
+    const total = 9;
+    const columns = 3;
+    // All items should compute totalRows = ceil(9/3) = 3 regardless of index
+    const [, , z0] = gridPosition(0, total, columns, 2, true);
+    // Row 0 items should all have the same Z
+    expect(z0).toBe(gridPosition(1, total, columns, 2, true)[2]);
+    // Row 1 items should all be the same
+    const [, , z3] = gridPosition(3, total, columns, 2, true);
+    expect(z3).toBe(gridPosition(4, total, columns, 2, true)[2]);
+    expect(z3).toBe(gridPosition(5, total, columns, 2, true)[2]);
   });
 });
 
