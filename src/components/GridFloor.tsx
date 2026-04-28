@@ -2,11 +2,10 @@ import React from 'react';
 import { Grid } from '@react-three/drei';
 
 export interface GridFloorProps {
-  size?: number;
-  divisions?: number;
-  color?: string;
-  fadeDistance?: number;
-  yPosition?: number;
+  readonly size?: number;
+  readonly color?: string;
+  readonly fadeDistance?: number;
+  readonly yPosition?: number;
 }
 
 export const GridFloor: React.FC<GridFloorProps> = ({
@@ -17,6 +16,7 @@ export const GridFloor: React.FC<GridFloorProps> = ({
 }) => {
   return (
     <Grid
+      infiniteGrid
       position={[0, yPosition, 0]}
       args={[size, size]}
       cellSize={1}
@@ -26,7 +26,6 @@ export const GridFloor: React.FC<GridFloorProps> = ({
       sectionThickness={1}
       sectionColor="#3A3A5A"
       fadeDistance={fadeDistance}
-      infiniteGrid
     />
   );
 };

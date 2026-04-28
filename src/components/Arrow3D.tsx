@@ -5,13 +5,13 @@ import type { Vec3 } from '../utils/types';
 import { hexToRgb } from '../utils/colors';
 
 export interface Arrow3DProps {
-  from: Vec3;
-  to: Vec3;
-  color?: string;
-  thickness?: number;
-  animated?: boolean;
-  startFrame?: number;
-  durationFrames?: number;
+  readonly from: Vec3;
+  readonly to: Vec3;
+  readonly color?: string;
+  readonly thickness?: number;
+  readonly animated?: boolean;
+  readonly startFrame?: number;
+  readonly durationFrames?: number;
 }
 
 export const Arrow3D: React.FC<Arrow3DProps> = ({

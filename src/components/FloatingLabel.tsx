@@ -4,12 +4,11 @@ import { Text, Billboard } from '@react-three/drei';
 import type { Vec3, AnimationTiming } from '../utils/types';
 
 export interface FloatingLabelProps {
-  text: string;
-  position: Vec3;
-  fontSize?: number;
-  color?: string;
-  backgroundColor?: string;
-  animateIn?: AnimationTiming;
+  readonly text: string;
+  readonly position: Vec3;
+  readonly fontSize?: number;
+  readonly color?: string;
+  readonly animateIn?: AnimationTiming;
 }
 
 export const FloatingLabel: React.FC<FloatingLabelProps> = ({

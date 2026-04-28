@@ -5,13 +5,13 @@ import { createSeededRandom, seededRange } from '../utils/random';
 import { hexToRgb } from '../utils/colors';
 
 export interface ParticleFieldProps {
-  count?: number;
-  size?: number;
-  color?: string;
-  spread?: number;
-  speed?: number;
-  opacity?: number;
-  seed?: number;
+  readonly count?: number;
+  readonly size?: number;
+  readonly color?: string;
+  readonly spread?: number;
+  readonly speed?: number;
+  readonly opacity?: number;
+  readonly seed?: number;
 }
 
 export const ParticleField: React.FC<ParticleFieldProps> = ({
@@ -63,11 +63,11 @@ export const ParticleField: React.FC<ParticleFieldProps> = ({
         />
       </bufferGeometry>
       <pointsMaterial
+        transparent
+        sizeAttenuation
         size={size}
         color={new THREE.Color(...rgb)}
-        transparent
         opacity={opacity}
-        sizeAttenuation
         blending={THREE.AdditiveBlending}
         depthWrite={false}
       />

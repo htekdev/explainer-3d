@@ -5,14 +5,14 @@ import type { Vec3 } from '../utils/types';
 import { createSeededRandom, seededRange } from '../utils/random';
 
 export interface TokenStreamProps {
-  tokens: string[];
-  position: Vec3;
-  direction?: 'left' | 'right' | 'up' | 'down';
-  speed?: number;
-  color?: string;
-  fontSize?: number;
-  startFrame?: number;
-  seed?: number;
+  readonly tokens: string[];
+  readonly position: Vec3;
+  readonly direction?: 'left' | 'right' | 'up' | 'down';
+  readonly speed?: number;
+  readonly color?: string;
+  readonly fontSize?: number;
+  readonly startFrame?: number;
+  readonly seed?: number;
 }
 
 const DIRECTION_VECTORS: Record<string, [number, number, number]> = {

@@ -6,13 +6,13 @@ import { hexToRgb } from '../utils/colors';
 import { distance } from '../utils/layout';
 
 export interface ConnectionBeamProps {
-  from: Vec3;
-  to: Vec3;
-  color?: string;
-  width?: number;
-  animated?: boolean;
-  pulseSpeed?: number;
-  startFrame?: number;
+  readonly from: Vec3;
+  readonly to: Vec3;
+  readonly color?: string;
+  readonly width?: number;
+  readonly animated?: boolean;
+  readonly pulseSpeed?: number;
+  readonly startFrame?: number;
 }
 
 export const ConnectionBeam: React.FC<ConnectionBeamProps> = ({
@@ -54,18 +54,18 @@ export const ConnectionBeam: React.FC<ConnectionBeamProps> = ({
       <mesh position={mid} quaternion={quaternion}>
         <cylinderGeometry args={[width, width, len, 6]} />
         <meshStandardMaterial
+          transparent
           color={new THREE.Color(...rgb)}
           emissive={new THREE.Color(...rgb)}
           emissiveIntensity={pulse}
-          transparent
           opacity={opacity}
         />
       </mesh>
       <mesh position={mid} quaternion={quaternion}>
         <cylinderGeometry args={[width * 3, width * 3, len, 6]} />
         <meshBasicMaterial
-          color={new THREE.Color(...rgb)}
           transparent
+          color={new THREE.Color(...rgb)}
           opacity={opacity * 0.1 * pulse}
           blending={THREE.AdditiveBlending}
           depthWrite={false}

@@ -5,12 +5,12 @@ import type { Vec3 } from '../utils/types';
 import { hexToRgb } from '../utils/colors';
 
 export interface GlowOrbProps {
-  position: Vec3;
-  radius?: number;
-  color?: string;
-  pulseSpeed?: number;
-  intensity?: number;
-  startFrame?: number;
+  readonly position: Vec3;
+  readonly radius?: number;
+  readonly color?: string;
+  readonly pulseSpeed?: number;
+  readonly intensity?: number;
+  readonly startFrame?: number;
 }
 
 export const GlowOrb: React.FC<GlowOrbProps> = ({
@@ -37,10 +37,10 @@ export const GlowOrb: React.FC<GlowOrbProps> = ({
       <mesh scale={[scale, scale, scale]}>
         <sphereGeometry args={[radius, 32, 32]} />
         <meshStandardMaterial
+          transparent
           color={new THREE.Color(...rgb)}
           emissive={new THREE.Color(...rgb)}
           emissiveIntensity={currentIntensity}
-          transparent
           opacity={opacity}
           roughness={0.1}
           metalness={0.8}
@@ -49,8 +49,8 @@ export const GlowOrb: React.FC<GlowOrbProps> = ({
       <mesh scale={[scale * 1.3, scale * 1.3, scale * 1.3]}>
         <sphereGeometry args={[radius, 16, 16]} />
         <meshBasicMaterial
-          color={new THREE.Color(...rgb)}
           transparent
+          color={new THREE.Color(...rgb)}
           opacity={opacity * 0.15}
           blending={THREE.AdditiveBlending}
           depthWrite={false}

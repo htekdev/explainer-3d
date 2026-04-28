@@ -10,7 +10,7 @@ export interface CameraKeyframe {
 }
 
 export interface AnimatedCameraProps {
-  keyframes: CameraKeyframe[];
+  readonly keyframes: CameraKeyframe[];
 }
 
 export const AnimatedCamera: React.FC<AnimatedCameraProps> = ({ keyframes }) => {

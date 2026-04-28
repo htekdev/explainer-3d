@@ -6,18 +6,18 @@ import { EffectComposer, Bloom } from '@react-three/postprocessing';
 import * as THREE from 'three';
 
 interface Scene3DProps {
-  children: React.ReactNode;
-  camera?: {
+  readonly children: React.ReactNode;
+  readonly camera?: {
     position: [number, number, number];
     fov?: number;
     lookAt?: [number, number, number];
   };
-  bloom?: {
+  readonly bloom?: {
     intensity?: number;
     luminanceThreshold?: number;
     luminanceSmoothing?: number;
   };
-  backgroundColor?: string;
+  readonly backgroundColor?: string;
 }
 
 function Lights() {
@@ -30,7 +30,7 @@ function Lights() {
   );
 }
 
-function CameraLookAt({ target }: { target: [number, number, number] }) {
+function CameraLookAt({ target }: { readonly target: [number, number, number] }) {
   const { camera } = useThree();
   useFrame(() => {
     camera.lookAt(new THREE.Vector3(...target));

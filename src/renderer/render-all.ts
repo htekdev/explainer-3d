@@ -31,7 +31,7 @@ for (const comp of toRender) {
       { stdio: 'inherit', cwd: process.cwd() },
     );
     console.log(`✅ ${comp.id} complete\n`);
-  } catch (error) {
+  } catch {
     console.error(`❌ ${comp.id} failed\n`);
     process.exit(1);
   }

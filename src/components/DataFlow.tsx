@@ -6,15 +6,15 @@ import { createSeededRandom, seededRange } from '../utils/random';
 import { hexToRgb } from '../utils/colors';
 
 export interface DataFlowProps {
-  from: Vec3;
-  to: Vec3;
-  color?: string;
-  particleCount?: number;
-  speed?: number;
-  width?: number;
-  startFrame?: number;
-  durationFrames?: number;
-  seed?: number;
+  readonly from: Vec3;
+  readonly to: Vec3;
+  readonly color?: string;
+  readonly particleCount?: number;
+  readonly speed?: number;
+  readonly width?: number;
+  readonly startFrame?: number;
+  readonly durationFrames?: number;
+  readonly seed?: number;
 }
 
 export const DataFlow: React.FC<DataFlowProps> = ({
@@ -83,11 +83,11 @@ export const DataFlow: React.FC<DataFlowProps> = ({
         />
       </bufferGeometry>
       <pointsMaterial
+        transparent
+        sizeAttenuation
         size={0.08}
         color={new THREE.Color(...rgb)}
-        transparent
         opacity={0.8}
-        sizeAttenuation
         blending={THREE.AdditiveBlending}
         depthWrite={false}
       />

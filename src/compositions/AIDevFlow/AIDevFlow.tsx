@@ -16,11 +16,11 @@ const SCENES: SceneDefinition[] = [
 ];
 
 const CrossfadeWrapper: React.FC<{
-  sceneFrom: number;
-  sceneDuration: number;
-  isFirst: boolean;
-  isLast: boolean;
-  children: React.ReactNode;
+  readonly sceneFrom: number;
+  readonly sceneDuration: number;
+  readonly isFirst: boolean;
+  readonly isLast: boolean;
+  readonly children: React.ReactNode;
 }> = ({ sceneFrom, sceneDuration, isFirst, isLast, children }) => {
   const frame = useCurrentFrame() + sceneFrom;
   const sceneEnd = sceneFrom + sceneDuration;

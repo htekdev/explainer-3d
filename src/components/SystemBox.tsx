@@ -6,12 +6,12 @@ import type { Vec3, AnimationTiming } from '../utils/types';
 import { hexToRgb } from '../utils/colors';
 
 export interface SystemBoxProps {
-  position: Vec3;
-  size?: Vec3;
-  label: string;
-  color?: string;
-  glowIntensity?: number;
-  animateIn?: AnimationTiming;
+  readonly position: Vec3;
+  readonly size?: Vec3;
+  readonly label: string;
+  readonly color?: string;
+  readonly glowIntensity?: number;
+  readonly animateIn?: AnimationTiming;
 }
 
 export const SystemBox: React.FC<SystemBoxProps> = ({
@@ -48,10 +48,10 @@ export const SystemBox: React.FC<SystemBoxProps> = ({
     <group position={position} scale={[scale, scale, scale]}>
       <RoundedBox args={size} radius={0.1} smoothness={4}>
         <meshStandardMaterial
+          transparent
           color={new THREE.Color(...rgb)}
           emissive={new THREE.Color(...rgb)}
           emissiveIntensity={glowIntensity}
-          transparent
           opacity={opacity}
           roughness={0.3}
           metalness={0.6}
