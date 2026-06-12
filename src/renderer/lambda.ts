@@ -25,6 +25,8 @@ function requireEnv(name: string): string {
 export interface LambdaRenderOptions {
   readonly compositionId: string;
   readonly outputPath: string;
+  readonly inputProps?: Record<string, unknown>;
+  readonly privacy?: 'public' | 'private';
   readonly onProgress?: (pct: number) => void;
 }
 
@@ -75,10 +77,10 @@ export async function renderOnLambda(options: LambdaRenderOptions): Promise<stri
     functionName,
     serveUrl,
     composition: options.compositionId,
-    inputProps: {},
+    inputProps: options.inputProps ?? {},
     codec: 'h264',
     framesPerLambda: 20,
-    privacy: 'private',
+    privacy: options.privacy ?? 'public',
   });
 
   console.log(`   Render ID: ${renderId}`);
