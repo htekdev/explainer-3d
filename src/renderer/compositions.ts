@@ -5,6 +5,12 @@ export const COMPOSITIONS = {
     durationInFrames: 1800,
     fps: 60,
   },
+  LLMExplainer: {
+    id: 'LLMExplainer',
+    defaultOutput: 'out/llm-explainer.mp4',
+    durationInFrames: 2700,
+    fps: 60,
+  },
 } as const;
 
 export type CompositionId = keyof typeof COMPOSITIONS;
